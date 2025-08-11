@@ -1,0 +1,11 @@
+# Flutter & Dart
+build/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+pubspec.lock
+# Firebase Functions
+functions/node_modules/
+# Environment secrets
+.env

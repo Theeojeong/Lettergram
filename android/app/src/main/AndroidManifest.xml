@@ -1,0 +1,13 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.example.retromessenger">
+    <!-- POST_NOTIFICATIONS 권한은 Android 13 이상에서 필요 -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- 선택: SMS 가져오기 모듈은 별도 플레버에서만 활성화 -->
+    <application android:label="RetroMessenger" android:icon="@mipmap/ic_launcher">
+        <activity android:name=".MainActivity" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>
