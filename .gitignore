@@ -9,3 +9,4 @@ pubspec.lock
 functions/node_modules/
 # Environment secrets
 .env
+.venv
