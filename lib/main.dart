@@ -16,11 +16,11 @@ final _router = GoRouter(
   routes: [
     GoRoute(path: '/', builder: (c, s) => const ThreadListScreen()),
     GoRoute(path: '/thread/:id', builder: (c, s) {
-      final id = s.params['id']!;
+      final id = s.pathParameters['id']!;
       return MessageDetailScreen(threadId: id);
     }),
     GoRoute(path: '/compose/:id', builder: (c, s) {
-      final id = s.params['id']!;
+      final id = s.pathParameters['id']!;
       return ComposeMessageScreen(threadId: id);
     }),
     GoRoute(path: '/settings', builder: (c, s) => const SettingsScreen()),
