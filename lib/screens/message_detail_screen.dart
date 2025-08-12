@@ -5,6 +5,7 @@ import '../providers/message_detail_provider.dart';
 import '../widgets/index_bar.dart';
 import '../widgets/soft_key_bar.dart';
 import '../widgets/message_bubble.dart';
+import '../widgets/feature_status_bar.dart';
 
 /// 메시지 상세 화면
 class MessageDetailScreen extends ConsumerWidget {
@@ -16,12 +17,14 @@ class MessageDetailScreen extends ConsumerWidget {
     // 데모용 메시지 리스트
     final messages = [
       {
-        'body': '안녕? 오늘 저녁에 시간 돼?',
-        'sender': '친구',
+        'title': '약속 꼭 약속',
+        'body': '오늘 스터디 7시에 보는 거 잊지 말기! 장소는 그대로.',
+        'sender': '예지',
         'timestamp': '12/16 12:22 PM'
       },
       {
-        'body': '네 내일 봐요!',
+        'title': null,
+        'body': '넵 내일 봬요. 자료는 공유드릴게요.',
         'sender': '010-0000-0000',
         'timestamp': '12/16 12:25 PM'
       }
@@ -32,36 +35,38 @@ class MessageDetailScreen extends ConsumerWidget {
     final msg = messages[state.index];
 
     return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 24,
-        title: const Text('3:55', textAlign: TextAlign.right),
-      ),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          const FeatureStatusBar(timeText: '3:55'),
           IndexBar(
             index: state.index,
             total: messages.length,
             onPrev: () => notifier.prev(),
             onNext: () => notifier.next(messages.length),
           ),
+          const SizedBox(height: 8),
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
             child: MessageBubble(
-              body: msg['body']!,
-              sender: msg['sender']!,
-              timestamp: msg['timestamp']!,
+              title: msg['title'] as String?,
+              body: msg['body'] as String,
+              sender: msg['sender'] as String,
+              timestamp: msg['timestamp'] as String,
             ),
           ),
           const Spacer(),
           SoftKeyBar(
             onMenu: () {
               showModalBottomSheet(
-                  context: context,
-                  builder: (c) => ListView(children: const [
-                        ListTile(title: Text('통화 걸기')), // 더미
-                        ListTile(title: Text('즐겨찾기')),
-                        ListTile(title: Text('삭제')),
-                      ]));
+                context: context,
+                backgroundColor: Colors.black,
+                builder: (c) => ListView(children: const [
+                  ListTile(title: Text('통화 걸기', style: TextStyle(color: Colors.white))),
+                  ListTile(title: Text('즐겨찾기', style: TextStyle(color: Colors.white))),
+                  ListTile(title: Text('삭제', style: TextStyle(color: Colors.white))),
+                ]),
+              );
             },
             onOk: notifier.toggleRead,
             onReply: () => context.push('/compose/$threadId'),

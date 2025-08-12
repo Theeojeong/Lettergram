@@ -10,4 +10,6 @@ final ThemeData retroTheme = ThemeData(
   ),
   scaffoldBackgroundColor: Colors.white,
   appBarTheme: const AppBarTheme(backgroundColor: Colors.black, foregroundColor: Colors.white),
+  listTileTheme: const ListTileThemeData(iconColor: Colors.white, textColor: Colors.white),
+  bottomSheetTheme: const BottomSheetThemeData(backgroundColor: Colors.black),
 );

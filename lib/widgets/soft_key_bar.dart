@@ -8,33 +8,28 @@ class SoftKeyBar extends StatelessWidget {
 
   const SoftKeyBar({super.key, this.onMenu, this.onOk, this.onReply});
 
+  Widget _btn(String label, VoidCallback? onTap) => InkWell(
+        onTap: onTap,
+        child: Center(
+          child: Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+        ),
+      );
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 56,
+      height: 48,
       decoration: BoxDecoration(
-        border: Border(top: BorderSide(color: Colors.grey.shade400)),
+        color: Colors.black,
+        border: Border(top: BorderSide(color: Colors.grey.shade700)),
       ),
       child: Row(
         children: [
-          Expanded(
-            child: TextButton(
-              onPressed: onMenu,
-              child: const Text('메뉴', semanticsLabel: '메뉴'),
-            ),
-          ),
-          Expanded(
-            child: TextButton(
-              onPressed: onOk,
-              child: const Text('확인', semanticsLabel: '확인'),
-            ),
-          ),
-          Expanded(
-            child: TextButton(
-              onPressed: onReply,
-              child: const Text('답장', semanticsLabel: '답장'),
-            ),
-          ),
+          Expanded(child: _btn('메뉴', onMenu)),
+          Container(width: 1, color: Colors.grey.shade700),
+          Expanded(child: _btn('확인', onOk)),
+          Container(width: 1, color: Colors.grey.shade700),
+          Expanded(child: _btn('답장', onReply)),
         ],
       ),
     );

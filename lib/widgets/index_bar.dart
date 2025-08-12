@@ -17,21 +17,19 @@ class IndexBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onHorizontalDragEnd: (details) {
-        if (details.primaryVelocity == null) return;
-        if (details.primaryVelocity! > 0) {
-          onPrev?.call();
-        } else {
-          onNext?.call();
-        }
-      },
+    return Container(
+      height: 40,
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      decoration: BoxDecoration(
+        color: Colors.black,
+        border: Border(bottom: BorderSide(color: Colors.grey.shade700)),
+      ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          IconButton(onPressed: onPrev, icon: const Icon(Icons.arrow_left)),
-          Text('< ${index + 1}/$total >', style: const TextStyle(fontSize: 16)),
-          IconButton(onPressed: onNext, icon: const Icon(Icons.arrow_right)),
+          IconButton(onPressed: onPrev, icon: const Icon(Icons.arrow_left, color: Colors.white)),
+          Text('< ${index + 1}/$total >', style: const TextStyle(fontSize: 14, color: Colors.white)),
+          IconButton(onPressed: onNext, icon: const Icon(Icons.arrow_right, color: Colors.white)),
         ],
       ),
     );
