@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'screens/thread_list_screen.dart';
 import 'screens/message_detail_screen.dart';
 import 'screens/compose_message_screen.dart';
@@ -38,6 +39,11 @@ class RetroApp extends ConsumerWidget {
       routerConfig: _router,
       locale: const Locale('ko'),
       supportedLocales: const [Locale('ko'), Locale('en')],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
     );
   }
 }

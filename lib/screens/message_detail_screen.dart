@@ -56,22 +56,22 @@ class MessageDetailScreen extends ConsumerWidget {
             ),
           ),
           const Spacer(),
-          SoftKeyBar(
-            onMenu: () {
-              showModalBottomSheet(
-                context: context,
-                backgroundColor: Colors.black,
-                builder: (c) => ListView(children: const [
-                  ListTile(title: Text('통화 걸기', style: TextStyle(color: Colors.white))),
-                  ListTile(title: Text('즐겨찾기', style: TextStyle(color: Colors.white))),
-                  ListTile(title: Text('삭제', style: TextStyle(color: Colors.white))),
-                ]),
-              );
-            },
-            onOk: notifier.toggleRead,
-            onReply: () => context.push('/compose/$threadId'),
-          ),
         ],
+      ),
+      bottomNavigationBar: SoftKeyBar(
+        onMenu: () {
+          showModalBottomSheet(
+            context: context,
+            backgroundColor: Colors.black,
+            builder: (c) => ListView(children: const [
+              ListTile(title: Text('통화 걸기', style: TextStyle(color: Colors.white))),
+              ListTile(title: Text('즐겨찾기', style: TextStyle(color: Colors.white))),
+              ListTile(title: Text('삭제', style: TextStyle(color: Colors.white))),
+            ]),
+          );
+        },
+        onOk: notifier.toggleRead,
+        onReply: () => context.push('/compose/$threadId'),
       ),
     );
   }
