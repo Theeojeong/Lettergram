@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../repositories/messages_repository.dart';
+import '../repositories/threads_repository.dart';
 
 /// 답장 작성 화면
 class ComposeMessageScreen extends StatefulWidget {
@@ -11,6 +16,12 @@ class ComposeMessageScreen extends StatefulWidget {
 
 class _ComposeMessageScreenState extends State<ComposeMessageScreen> {
   final _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,9 +38,30 @@ class _ComposeMessageScreenState extends State<ComposeMessageScreen> {
             ),
             const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: () {
-                // Firestore에 메시지 추가 및 푸시 전송은 서비스 레이어에서 처리. 여기서는 스텁.
-                Navigator.pop(context);
+              onPressed: () async {
+                final text = _controller.text.trim();
+                if (text.isEmpty) {
+                  Navigator.pop(context);
+                  return;
+                }
+                final canUseFirebase = Firebase.apps.isNotEmpty;
+                if (canUseFirebase) {
+                  final user = FirebaseAuth.instance.currentUser;
+                  if (user == null) {
+                    await FirebaseAuth.instance.signInAnonymously();
+                  }
+                  final uid = FirebaseAuth.instance.currentUser!.uid;
+                  final threadsRepo = ThreadsRepository();
+                  await threadsRepo.upsertThread(widget.threadId, [uid]);
+                  final messagesRepo = MessagesRepository();
+                  await messagesRepo.sendMessage(widget.threadId, {
+                    'body': text,
+                    'senderId': uid,
+                    'title': null,
+                  });
+                  await threadsRepo.touchUpdatedAt(widget.threadId);
+                }
+                if (context.mounted) Navigator.pop(context);
               },
               child: const Text('보내기', semanticsLabel: '보내기'),
             ),

@@ -10,4 +10,18 @@ class ThreadsRepository {
         .orderBy('updatedAt', descending: true)
         .snapshots();
   }
+
+  Future<void> upsertThread(String threadId, List<String> members) async {
+    final ref = _db.collection('threads').doc(threadId);
+    await ref.set({
+      'members': members,
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
+
+  Future<void> touchUpdatedAt(String threadId) async {
+    await _db.collection('threads').doc(threadId).set({
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
 }

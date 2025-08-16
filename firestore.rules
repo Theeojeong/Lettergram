@@ -5,7 +5,10 @@ service cloud.firestore {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
     match /threads/{threadId} {
-      allow read, write: if request.auth != null && request.resource.data.members.contains(request.auth.uid);
+      // 읽기: 저장된 리소스의 members 기준으로 권한 확인
+      allow read: if request.auth != null && resource.data.members.contains(request.auth.uid);
+      // 쓰기: 요청 리소스의 members 기준으로 권한 확인
+      allow write: if request.auth != null && request.resource.data.members.contains(request.auth.uid);
       match /messages/{messageId} {
         allow read, write: if request.auth != null && get(/databases/$(database)/documents/threads/$(threadId)).data.members.contains(request.auth.uid);
       }

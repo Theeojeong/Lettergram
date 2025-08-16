@@ -15,12 +15,23 @@ export const sendPushOnNewMessage = functions.firestore
     const members = (thread.data()?.members as string[]) ?? [];
     const recipients = members.filter((m) => m !== senderId);
 
-    const tokensSnap = await admin
-      .firestore()
-      .collection('users')
-      .where(admin.firestore.FieldPath.documentId(), 'in', recipients)
-      .get();
-    const tokens = tokensSnap.docs.map((d) => d.data().token).filter((t) => t);
+    // Firestore 'in' 연산자는 최대 10개까지 지원하므로 청크로 나눠서 조회
+    const chunk = <T>(arr: T[], size: number) =>
+      arr.length <= size ? [arr] : Array.from({ length: Math.ceil(arr.length / size) }, (_, i) => arr.slice(i * size, (i + 1) * size));
+    const recipientChunks = chunk(recipients, 10);
+    const tokenDocsArrays = await Promise.all(
+      recipientChunks.map((ids) =>
+        admin
+          .firestore()
+          .collection('users')
+          .where(admin.firestore.FieldPath.documentId(), 'in', ids)
+          .get()
+          .then((snap) => snap.docs)
+      )
+    );
+    const flatDocs = tokenDocsArrays.flat();
+    // 단일 디바이스 토큰 스키마 가정: users/{uid}.token
+    const tokens = flatDocs.map((d) => (d.data() as any).token as string | undefined).filter((t): t is string => Boolean(t));
 
     if (tokens.length === 0) return;
 

@@ -2,14 +2,39 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'screens/thread_list_screen.dart';
 import 'screens/message_detail_screen.dart';
 import 'screens/compose_message_screen.dart';
 import 'screens/settings_screen.dart';
 import 'retro_theme.dart';
+import 'services/notification_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-void main() {
-  // Firestore 오프라인 퍼스트를 위해 초기화 과정이 필요하지만 여기서는 스텁 처리
+bool firebaseReady = false;
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  try {
+    await Firebase.initializeApp();
+    firebaseReady = true;
+    // iOS 포그라운드 알림 표시 옵션
+    await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+    // 익명 로그인으로 최소 인증 보장
+    if (FirebaseAuth.instance.currentUser == null) {
+      await FirebaseAuth.instance.signInAnonymously();
+    }
+    // 토큰 등록 등 알림 초기화
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    await NotificationService().init(uid: uid);
+  } catch (_) {
+    firebaseReady = false; // Firebase 설정이 없어도 UI 미리보기 가능
+  }
   runApp(const ProviderScope(child: RetroApp()));
 }
 
