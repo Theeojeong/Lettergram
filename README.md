@@ -9,6 +9,12 @@
 - 다크 테마 기본 적용(읽기 대비 최적화)
 - Firebase 미설정이어도 UI 미리보기 가능(실사용 시 Firebase 설정)
 
+## Demo 화면
+<img width="421" height="843" alt="image" src="https://github.com/user-attachments/assets/322b058b-ea83-41a0-af62-f84efb0f21f0" />
+
+<img width="425" height="844" alt="image" src="https://github.com/user-attachments/assets/ed162bd8-fdd3-474b-9bfc-8705e4c25a92" />
+
+
 ## 빠른 실행(웹 미리보기 + iPhone 프레임)
 ```
 flutter pub get
