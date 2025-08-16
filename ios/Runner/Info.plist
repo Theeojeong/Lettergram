@@ -3,7 +3,9 @@
 <plist version="1.0">
 <dict>
   <key>CFBundleName</key>
-  <string>RetroMessenger</string>
+  <string>lettergram</string>
+  <key>CFBundleDisplayName</key>
+  <string>lettergram</string>
   <key>UILaunchStoryboardName</key>
   <string>LaunchScreen</string>
   <key>UIBackgroundModes</key>

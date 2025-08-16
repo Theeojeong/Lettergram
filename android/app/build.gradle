@@ -2,10 +2,10 @@ plugins {
     id 'com.android.application'
 }
 android {
-    namespace 'com.example.retromessenger'
+    namespace 'com.theeojeong.lettergram'
     compileSdk 34
     defaultConfig {
-        applicationId "com.example.retromessenger"
+        applicationId "com.theeojeong.lettergram"
         minSdk 21
         targetSdk 34
         versionCode 1

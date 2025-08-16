@@ -11,6 +11,7 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
+  device_preview: ^1.2.0
   flutter_local_notifications: ^19.4.0
   firebase_core: ^4.0.0
   cloud_firestore: ^6.0.0
