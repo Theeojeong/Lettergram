@@ -122,7 +122,7 @@ class _ComposeMessageScreenState extends State<ComposeMessageScreen> {
                         if (context.mounted) Navigator.pop(context);
                       },
                       icon: const Icon(Icons.mark_email_read_outlined),
-                      label: const Text('보내기✉'),
+                      label: const Text('발송✉'),
                     ),
                   ),
                 ],
