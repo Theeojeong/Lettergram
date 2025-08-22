@@ -7,14 +7,10 @@ class MyMessagesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final items = [
+    final items = const [
       _Folder(icon: Icons.inbox_outlined, title: '받은 편지함 (Inbox)', route: '/inbox'),
-      _Folder(icon: Icons.drafts_outlined, title: '임시보관함 (Drafts)', route: '/folders/drafts'),
-      _Folder(icon: Icons.outbox_outlined, title: '보낼 편지함 (Outbox)', route: '/folders/outbox'),
       _Folder(icon: Icons.send_outlined, title: '보낸 편지함 (Sentbox)', route: '/folders/sent'),
-      _Folder(icon: Icons.note_alt_outlined, title: '템플릿 (Templates)', route: '/folders/templates'),
-      _Folder(icon: Icons.wifi_tethering_outlined, title: '방송메시지 (Cell Broadcast)', route: '/folders/broadcast'),
-      _Folder(icon: Icons.sd_storage_outlined, title: '메모리 상태 (Memory status)', route: '/folders/memory'),
+      _Folder(icon: Icons.drafts_outlined, title: '임시보관함 (Drafts)', route: '/folders/drafts'),
     ];
 
     return Scaffold(
@@ -42,4 +38,3 @@ class _Folder {
   final String route;
   const _Folder({required this.icon, required this.title, required this.route});
 }
-

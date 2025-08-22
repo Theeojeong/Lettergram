@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -10,11 +11,14 @@ class InboxListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final uid = FirebaseAuth.instance.currentUser?.uid;
+    final ready = Firebase.apps.isNotEmpty;
+    final uid = ready ? FirebaseAuth.instance.currentUser?.uid : null;
     return Scaffold(
       appBar: AppBar(title: const Text('받은 편지함')),
-      body: uid == null
-          ? const Center(child: Text('로그인이 필요합니다'))
+      body: !ready
+          ? const Center(child: Text('Firebase 미설정: 받은 편지함은 미리보기 불가'))
+          : uid == null
+              ? const Center(child: Text('로그인이 필요합니다'))
           : StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
               stream: FirebaseFirestore.instance
                   .collectionGroup('messages')

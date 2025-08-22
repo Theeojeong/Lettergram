@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 /// 임시보관함: users/{uid}/drafts
@@ -8,11 +9,14 @@ class DraftsListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
+    final ready = Firebase.apps.isNotEmpty;
+    final uid = ready ? FirebaseAuth.instance.currentUser?.uid : null;
     return Scaffold(
       appBar: AppBar(title: const Text('임시보관함')),
-      body: uid == null
-          ? const _CenterText('로그인이 필요합니다')
+      body: !ready
+          ? const _CenterText('Firebase 미설정: 임시보관함은 미리보기 불가')
+          : uid == null
+              ? const _CenterText('로그인이 필요합니다')
           : StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
               stream: FirebaseFirestore.instance
                   .collection('users')
@@ -61,4 +65,3 @@ String _ellipsis(String s, {int max = 18}) {
   if (s.length <= max) return s;
   return s.substring(0, max) + '…';
 }
-

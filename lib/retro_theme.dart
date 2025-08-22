@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart';
 /// 2014년 피처폰 분위기의 테마 정의
 final ThemeData retroTheme = ThemeData(
   useMaterial3: true,
-  fontFamily: 'NotoSansKR',
   colorScheme: ColorScheme.dark(
     primary: CupertinoColors.systemYellow.color,
     secondary: CupertinoColors.systemGrey.color,

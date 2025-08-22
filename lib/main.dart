@@ -19,20 +19,23 @@ import 'screens/drafts_list_screen.dart';
 import 'retro_theme.dart';
 import 'services/notification_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'firebase_options.dart';
 
 bool firebaseReady = false;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
-    await Firebase.initializeApp();
+    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
     firebaseReady = true;
     // iOS 포그라운드 알림 표시 옵션
-    await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
+    try {
+      await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+    } catch (_) {}
     // 익명 로그인으로 최소 인증 보장
     if (FirebaseAuth.instance.currentUser == null) {
       await FirebaseAuth.instance.signInAnonymously();
@@ -81,11 +84,7 @@ final _router = GoRouter(
     }),
     // 보조함(데모용 플레이스홀더)
     GoRoute(path: '/folders/drafts', builder: (c, s) => const DraftsListScreen()),
-    GoRoute(path: '/folders/outbox', builder: (c, s) => const _PlaceholderScreen(title: '보낼 편지함 (Outbox)')),
     GoRoute(path: '/folders/sent', builder: (c, s) => const SentListScreen()),
-    GoRoute(path: '/folders/templates', builder: (c, s) => const _PlaceholderScreen(title: '템플릿 (Templates)')),
-    GoRoute(path: '/folders/broadcast', builder: (c, s) => const _PlaceholderScreen(title: '방송메시지 (Cell Broadcast)')),
-    GoRoute(path: '/folders/memory', builder: (c, s) => const _PlaceholderScreen(title: '메모리 상태 (Memory status)')),
     GoRoute(path: '/settings', builder: (c, s) => const SettingsScreen()),
   ],
 );
