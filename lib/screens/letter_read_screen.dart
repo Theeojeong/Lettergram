@@ -1,15 +1,21 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 /// 받은 편지 열람 화면(상대 메시지만 보여주는 장면)
 class LetterReadScreen extends StatelessWidget {
-  const LetterReadScreen({super.key, required this.letterId});
-  final String letterId;
+  const LetterReadScreen({super.key, this.letterId, this.threadId, this.messageId});
+  final String? letterId; // 데모용
+  final String? threadId; // Firestore 경로용
+  final String? messageId; // Firestore 경로용
 
   @override
   Widget build(BuildContext context) {
-    // 데모 데이터(실제에선 letterId로 조회)
-    final data = _demoLetters[letterId] ?? _demoLetters.values.first;
+    if (threadId != null && messageId != null) {
+      return _buildFromFirestore(context);
+    }
+    // 데모 데이터(레거시 경로: /letter/:id)
+    final data = _demoLetters[letterId!] ?? _demoLetters.values.first;
     final scheme = Theme.of(context).colorScheme;
     final onSurface = scheme.onSurface;
 
@@ -97,6 +103,125 @@ class LetterReadScreen extends StatelessWidget {
             onReply: () => context.push('/compose/${data['from']}'),
           ),
         ],
+      ),
+      backgroundColor: Theme.of(context).colorScheme.surface,
+    );
+  }
+
+  Widget _buildFromFirestore(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final onSurface = scheme.onSurface;
+    final docRef = FirebaseFirestore.instance
+        .collection('threads')
+        .doc(threadId)
+        .collection('messages')
+        .doc(messageId);
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('편지'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.more_horiz),
+            onPressed: () => _showMenu(context),
+          ),
+        ],
+      ),
+      body: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+        stream: docRef.snapshots(),
+        builder: (context, snap) {
+          if (!snap.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          final data = snap.data!.data();
+          if (data == null) return const Center(child: Text('메시지를 찾을 수 없습니다'));
+          final body = data['body'] as String? ?? '';
+          final ts = (data['createdAt'] as Timestamp?)?.toDate();
+          final name = data['senderName'] as String? ?? '';
+          final phone = data['senderPhone'] as String? ?? '';
+          final attachments = (data['attachments'] as List?)?.cast<Map>() ?? const [];
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      child: DefaultTextStyle(
+                        style: TextStyle(
+                          fontSize: 16,
+                          height: 1.6,
+                          fontFamilyFallback: const ['Georgia', 'serif'],
+                          color: onSurface,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const SizedBox(height: 12),
+                            Text(body),
+                            const SizedBox(height: 12),
+                            if (attachments.isNotEmpty) ...[
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: attachments
+                                    .map((a) => Chip(
+                                          avatar: const Icon(Icons.attachment, size: 16),
+                                          label: Text((a['name'] as String?) ?? '첨부'),
+                                        ))
+                                    .toList(),
+                              ),
+                              const SizedBox(height: 12),
+                            ],
+                            Builder(builder: (_) {
+                              final timeStr = ts != null ? _formatTimeAmPm(ts) : '';
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    timeStr,
+                                    style: TextStyle(
+                                      color: onSurface.withOpacity(0.55),
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    name,
+                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                          color: onSurface,
+                                          fontWeight: FontWeight.w600,
+                                        ) ??
+                                        const TextStyle(),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    phone,
+                                    style: TextStyle(
+                                      color: onSurface.withOpacity(0.45),
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              _BottomActions(
+                onMenu: () => _showMenu(context),
+                onConfirm: () => context.go('/'),
+                onReply: () => context.push('/compose/${threadId}'),
+              ),
+            ],
+          );
+        },
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,
     );

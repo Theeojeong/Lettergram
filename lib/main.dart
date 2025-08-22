@@ -14,6 +14,8 @@ import 'screens/settings_screen.dart';
 import 'screens/letter_read_screen.dart';
 import 'screens/my_messages_screen.dart';
 import 'screens/inbox_list_screen.dart';
+import 'screens/sent_list_screen.dart';
+import 'screens/drafts_list_screen.dart';
 import 'retro_theme.dart';
 import 'services/notification_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -58,10 +60,16 @@ final _router = GoRouter(
     GoRoute(path: '/my', builder: (c, s) => const MyMessagesScreen()),
     // 받은 편지함
     GoRoute(path: '/inbox', builder: (c, s) => const InboxListScreen()),
-    // 새 편지 열람 화면(받은 편지 단일 장면)
+    // 새 편지 열람 화면(데모 경로)
     GoRoute(path: '/letter/:id', builder: (c, s) {
       final id = s.pathParameters['id']!;
       return LetterReadScreen(letterId: id);
+    }),
+    // Firestore 기반 단일 메시지 보기
+    GoRoute(path: '/letter/:threadId/:messageId', builder: (c, s) {
+      final threadId = s.pathParameters['threadId']!;
+      final messageId = s.pathParameters['messageId']!;
+      return LetterReadScreen(threadId: threadId, messageId: messageId);
     }),
     GoRoute(path: '/thread/:id', builder: (c, s) {
       final id = s.pathParameters['id']!;
@@ -72,12 +80,12 @@ final _router = GoRouter(
       return ComposeMessageScreen(threadId: id);
     }),
     // 보조함(데모용 플레이스홀더)
-    GoRoute(path: '/folders/drafts', builder: (c, s) => _PlaceholderScreen(title: '임시보관함 (Drafts)')),
-    GoRoute(path: '/folders/outbox', builder: (c, s) => _PlaceholderScreen(title: '보낼 편지함 (Outbox)')),
-    GoRoute(path: '/folders/sent', builder: (c, s) => _PlaceholderScreen(title: '보낸 편지함 (Sentbox)')),
-    GoRoute(path: '/folders/templates', builder: (c, s) => _PlaceholderScreen(title: '템플릿 (Templates)')),
-    GoRoute(path: '/folders/broadcast', builder: (c, s) => _PlaceholderScreen(title: '방송메시지 (Cell Broadcast)')),
-    GoRoute(path: '/folders/memory', builder: (c, s) => _PlaceholderScreen(title: '메모리 상태 (Memory status)')),
+    GoRoute(path: '/folders/drafts', builder: (c, s) => const DraftsListScreen()),
+    GoRoute(path: '/folders/outbox', builder: (c, s) => const _PlaceholderScreen(title: '보낼 편지함 (Outbox)')),
+    GoRoute(path: '/folders/sent', builder: (c, s) => const SentListScreen()),
+    GoRoute(path: '/folders/templates', builder: (c, s) => const _PlaceholderScreen(title: '템플릿 (Templates)')),
+    GoRoute(path: '/folders/broadcast', builder: (c, s) => const _PlaceholderScreen(title: '방송메시지 (Cell Broadcast)')),
+    GoRoute(path: '/folders/memory', builder: (c, s) => const _PlaceholderScreen(title: '메모리 상태 (Memory status)')),
     GoRoute(path: '/settings', builder: (c, s) => const SettingsScreen()),
   ],
 );

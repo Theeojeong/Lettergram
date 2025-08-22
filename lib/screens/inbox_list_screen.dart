@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -5,36 +7,60 @@ import 'package:go_router/go_router.dart';
 class InboxListScreen extends StatelessWidget {
   const InboxListScreen({super.key});
 
-  // 데모용 데이터
-  static const _inbox = [
-    {'id': 'r1', 'from': '윤슬', 'title': '여름 한 구절', 'status': '도착·미개봉'},
-    {'id': 'r2', 'from': '별비', 'title': '밤하늘 소인', 'status': '도착·개봉'},
-    {'id': 'r3', 'from': '민호', 'title': '창밖의 비', 'status': '도착·미개봉'},
-  ];
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final uid = FirebaseAuth.instance.currentUser?.uid;
     return Scaffold(
       appBar: AppBar(title: const Text('받은 편지함')),
-      body: ListView.separated(
-        itemCount: _inbox.length,
-        separatorBuilder: (_, __) => const Divider(height: 1),
-        itemBuilder: (context, i) {
-          final it = _inbox[i];
-          final opened = (it['status']?.toString().contains('개봉') ?? false);
-          return ListTile(
-            leading: Icon(opened
-                ? Icons.mark_email_read_outlined
-                : Icons.mark_email_unread_outlined),
-            title: Text('${it['from']} — "${it['title']}"'),
-            trailing: Icon(Icons.chevron_right,
-                color: isDark ? Colors.white30 : Colors.black26),
-            onTap: () => context.push('/letter/${it['id']}'),
-          );
-        },
-      ),
+      body: uid == null
+          ? const Center(child: Text('로그인이 필요합니다'))
+          : StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+              stream: FirebaseFirestore.instance
+                  .collectionGroup('messages')
+                  .where('members', arrayContains: uid)
+                  .orderBy('createdAt', descending: true)
+                  .snapshots(),
+              builder: (context, snap) {
+                if (snap.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                final docs = snap.data?.docs
+                        .where((d) => (d.data()['senderId'] as String?) != uid)
+                        .toList() ??
+                    const [];
+                if (docs.isEmpty) {
+                  return const Center(child: Text('받은 메시지가 없습니다'));
+                }
+                return ListView.separated(
+                  itemCount: docs.length,
+                  separatorBuilder: (_, __) => const Divider(height: 1),
+                  itemBuilder: (context, i) {
+                    final d = docs[i];
+                    final data = d.data();
+                    final from = data['senderName'] as String? ?? '상대';
+                    final body = data['body'] as String? ?? '';
+                    // 메시지 단일 보기로 이동: threadId와 messageId 필요
+                    final segments = d.reference.path.split('/');
+                    // threads/{threadId}/messages/{messageId}
+                    final threadId = segments[1];
+                    final messageId = segments[3];
+                    return ListTile(
+                      leading: const Icon(Icons.mark_email_unread_outlined),
+                      title: Text('$from — "${_ellipsis(body)}"'),
+                      trailing: Icon(Icons.chevron_right,
+                          color: isDark ? Colors.white30 : Colors.black26),
+                      onTap: () => context.push('/letter/$threadId/$messageId'),
+                    );
+                  },
+                );
+              },
+            ),
     );
   }
 }
 
+String _ellipsis(String s, {int max = 18}) {
+  if (s.length <= max) return s;
+  return s.substring(0, max) + '…';
+}
