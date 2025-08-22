@@ -7,11 +7,13 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'screens/thread_list_screen.dart';
+import 'screens/messages_home_screen.dart';
 import 'screens/message_detail_screen.dart';
 import 'screens/compose_message_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/letter_read_screen.dart';
+import 'screens/my_messages_screen.dart';
+import 'screens/inbox_list_screen.dart';
 import 'retro_theme.dart';
 import 'services/notification_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -50,7 +52,12 @@ Future<void> main() async {
 
 final _router = GoRouter(
   routes: [
-    GoRoute(path: '/', builder: (c, s) => const ThreadListScreen()),
+    // 최상위: 메시지 홈
+    GoRoute(path: '/', builder: (c, s) => const MessagesHomeScreen()),
+    // 내 메시지(보조함 목록)
+    GoRoute(path: '/my', builder: (c, s) => const MyMessagesScreen()),
+    // 받은 편지함
+    GoRoute(path: '/inbox', builder: (c, s) => const InboxListScreen()),
     // 새 편지 열람 화면(받은 편지 단일 장면)
     GoRoute(path: '/letter/:id', builder: (c, s) {
       final id = s.pathParameters['id']!;
@@ -64,6 +71,13 @@ final _router = GoRouter(
       final id = s.pathParameters['id']!;
       return ComposeMessageScreen(threadId: id);
     }),
+    // 보조함(데모용 플레이스홀더)
+    GoRoute(path: '/folders/drafts', builder: (c, s) => _PlaceholderScreen(title: '임시보관함 (Drafts)')),
+    GoRoute(path: '/folders/outbox', builder: (c, s) => _PlaceholderScreen(title: '보낼 편지함 (Outbox)')),
+    GoRoute(path: '/folders/sent', builder: (c, s) => _PlaceholderScreen(title: '보낸 편지함 (Sentbox)')),
+    GoRoute(path: '/folders/templates', builder: (c, s) => _PlaceholderScreen(title: '템플릿 (Templates)')),
+    GoRoute(path: '/folders/broadcast', builder: (c, s) => _PlaceholderScreen(title: '방송메시지 (Cell Broadcast)')),
+    GoRoute(path: '/folders/memory', builder: (c, s) => _PlaceholderScreen(title: '메모리 상태 (Memory status)')),
     GoRoute(path: '/settings', builder: (c, s) => const SettingsScreen()),
   ],
 );
@@ -87,6 +101,19 @@ class RetroApp extends ConsumerWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
+    );
+  }
+}
+
+class _PlaceholderScreen extends StatelessWidget {
+  final String title;
+  const _PlaceholderScreen({required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(title)),
+      body: const Center(child: Text('준비 중(데모)')),
     );
   }
 }
